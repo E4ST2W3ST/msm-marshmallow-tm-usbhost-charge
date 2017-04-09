@@ -47,6 +47,7 @@ int adjust_standard(struct easycap *peasycap, v4l2_std_id std_id)
 	unsigned int itwas, isnow;
 	bool resubmit;
 
+	printk("#:# easycap_ioctl adjust_standard id=0x%08X\n",(unsigned int)std_id);
 	if (!peasycap) {
 		SAY("ERROR: peasycap is NULL\n");
 		return -EFAULT;
@@ -1979,6 +1980,10 @@ long easycap_unlocked_ioctl(struct file *file,
 		}
 
 		JOM(8, "User requests standard: 0x%08X%08X\n",
+		    (int)((std_id & (((v4l2_std_id)0xFFFFFFFF) << 32)) >> 32),
+		    (int)(std_id & ((v4l2_std_id)0xFFFFFFFF)));
+
+		printk("#:# easycap_ioctl User requests standard: 0x%08X%08X\n",
 		    (int)((std_id & (((v4l2_std_id)0xFFFFFFFF) << 32)) >> 32),
 		    (int)(std_id & ((v4l2_std_id)0xFFFFFFFF)));
 

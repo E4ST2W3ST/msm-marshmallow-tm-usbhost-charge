@@ -140,7 +140,7 @@ static int easycap_open(struct inode *inode, struct file *file)
 	int rc;
 
 	JOT(4, "\n");
-	SAY("==========OPEN=========\n");
+	SAY("==========OPEN2=========\n");
 
 	pvideo_device = video_devdata(file);
 	if (!pvideo_device) {

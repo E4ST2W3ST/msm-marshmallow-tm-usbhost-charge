@@ -14,6 +14,9 @@
  * GNU General Public License for more details.
  *
  */
+ 
+ // patch by Darren Whobrey <d.whobrey@mildai.org>
+ // https://android-review.googlesource.com/#/c/69674/
 
 /* #define DEBUG */
 /* #define VERBOSE_DEBUG */
@@ -253,7 +256,7 @@ static struct usb_request *req_get(struct acc_dev *dev, struct list_head *head)
 
 static void acc_set_disconnected(struct acc_dev *dev)
 {
-	dev->online = 0;
+	// dev->online = 0;		// tmtmtm: do not go offline, only disconnect
 	dev->disconnected = 1;
 }
 
@@ -746,7 +749,7 @@ static int acc_release(struct inode *ip, struct file *fp)
 	printk(KERN_INFO "acc_release\n");
 
 	WARN_ON(!atomic_xchg(&_acc_dev->open_excl, 0));
-	_acc_dev->disconnected = 0;
+	_acc_dev->disconnected = 1;		// indicate that we are disconnected
 	return 0;
 }
 
@@ -972,6 +975,10 @@ acc_function_unbind(struct usb_configuration *c, struct usb_function *f)
 	struct usb_request *req;
 	int i;
 
+	dev->online = 0; 		  // tmtmtm: clear online flag
+	wake_up(&dev->read_wq);   // tmtmtm: unblock reads on closure
+	wake_up(&dev->write_wq);  // tmtmtm: likewise for writes
+
 	while ((req = req_get(dev, &dev->tx_idle)))
 		acc_request_free(req, dev->ep_in);
 	for (i = 0; i < RX_REQ_MAX; i++)
@@ -1114,6 +1121,7 @@ static int acc_function_set_alt(struct usb_function *f,
 	}
 
 	dev->online = 1;
+	dev->disconnected = 0; 			// tmtmtm: if online then not disconnected
 
 	/* readers may be blocked waiting for us to go online */
 	wake_up(&dev->read_wq);
@@ -1127,6 +1135,7 @@ static void acc_function_disable(struct usb_function *f)
 
 	DBG(cdev, "acc_function_disable\n");
 	acc_set_disconnected(dev);
+	dev->online = 0;				// tmtmtm: now need to clear online flag here too
 	usb_ep_disable(dev->ep_in);
 	usb_ep_disable(dev->ep_out);
 
