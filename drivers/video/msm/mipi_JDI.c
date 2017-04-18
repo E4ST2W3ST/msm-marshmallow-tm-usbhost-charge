@@ -249,16 +249,6 @@ int last_backlight_level=100;
 
 static void JDI_command_backlight(int level)
 {
-    printk("tmtmtm mipi_JDI.c JDI_command_backlight level=%d usbhost_backlight_off=%d last_backlight_level=%d\n", 
-        level, usbhost_backlight_off,last_backlight_level); // tmtmtm
-    if(usbhost_backlight_off>0 || last_backlight_level==0) { // tmtmtm
-      if(level<=6) { 
-        level=0;	// tmtmtm: allow brightness level below 1
-        printk("tmtmtm mipi_JDI.c JDI_command_backlight   fix=%d usbhost_backlight_off=%d last_backlight_level=%d\n", 
-           level, usbhost_backlight_off,last_backlight_level); // tmtmtm
-      }
-    }
-
     //printk("tmtmtm mipi_JDI.c JDI_command_backlight2=%d usbhost_backlight_off=%d last_backlight_level=%d\n", 
     //    level, usbhost_backlight_off,last_backlight_level); // tmtmtm
 	pr_debug("%s: back light level %d\n", __func__, level);
