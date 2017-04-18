@@ -265,11 +265,16 @@ static int smb345_pin_control(bool state)
 {
     struct i2c_client *client = charger->client;
     u8 ret = 0;
+    if(state){
+        SMB_NOTICE("Ignoring enable charger request\n");
+    }
+    state=  false;
 
     mutex_lock(&charger->pinctrl_lock);
 
     if (state) {
         /*Pin Controls -active low */
+	SMB_NOTICE("Enabling charger\n");
         ret = smb345_update_reg(client, smb345_PIN_CTRL, PIN_ACT_LOW);
         if (ret < 0) {
             dev_err(&client->dev, "%s(): Failed to"
@@ -277,6 +282,7 @@ static int smb345_pin_control(bool state)
         }
     } else {
         /*Pin Controls -active high */
+	SMB_NOTICE("Disabling charger\n");
         ret = smb345_clear_reg(client, smb345_PIN_CTRL, PIN_ACT_LOW);
         if (ret < 0) {
             dev_err(&client->dev, "%s(): Failed to"

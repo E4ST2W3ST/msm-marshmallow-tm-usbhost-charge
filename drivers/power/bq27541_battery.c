@@ -628,14 +628,14 @@ static int bq27541_get_psp(int reg_offset, enum power_supply_property psp,
 
 static int bq27541_get_capacity(union power_supply_propval *val)
 {
-    s32 ret;
+    //s32 ret;
     s32 temp_capacity;
-    int smb_retry=0;
-    bool check_cap = false;
-    int smb_retry_max = (SMBUS_RETRY + 2);
+    //int smb_retry=0;
+    //bool check_cap = false;
+    //int smb_retry_max = (SMBUS_RETRY + 2);
 
     bq27541_device->bat_capacity = 0;
-    do {
+    /*do {
         bq27541_device->smbus_status = bq27541_smbus_read_data(REG_CAPACITY, 0 ,&bq27541_device->bat_capacity);
         if ((bq27541_device->bat_capacity <= 0) || (bq27541_device->bat_capacity > 100)) {
             check_cap = true;
@@ -665,7 +665,9 @@ static int bq27541_get_capacity(union power_supply_propval *val)
         val->intval = bq27541_device->old_capacity;
         BAT_NOTICE("use old capacity=%u\n", bq27541_device->old_capacity);
         return 0;
-    }
+    } */
+
+    temp_capacity = bq27541_device->bat_capacity = 100;
 
     /* start: for mapping %99 to 100%. Lose 84%*/
     if(temp_capacity==99)
